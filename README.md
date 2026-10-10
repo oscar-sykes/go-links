@@ -38,9 +38,18 @@ Port 80 is privileged, hence `sudo`.
 To start it automatically at boot instead (macOS LaunchDaemon, runs as root, restarts on crash):
 
 ```sh
-sudo cp com.go-links.plist /Library/LaunchDaemons/
+sed -e "s|__BUN__|$(which bun)|" -e "s|__DIR__|$PWD|" com.go-links.plist | sudo tee /Library/LaunchDaemons/com.go-links.plist >/dev/null
 sudo launchctl bootstrap system /Library/LaunchDaemons/com.go-links.plist
 # stop/remove: sudo launchctl bootout system /Library/LaunchDaemons/com.go-links.plist
 ```
 
 Logs go to `/tmp/go-links.log`. In Chrome, type `go/` or `http://go/admin` so it isn't treated as a search.
+
+### Troubleshooting
+
+- **Nothing happens / connection refused** — the server isn't running on port 80. Check `/tmp/go-links.log` (boot service) or the terminal running `sudo bun run start`. Make sure `bun install` has been run.
+- **`EADDRINUSE` / port 80 in use** — something else is using it (`sudo lsof -iTCP:80 -sTCP:LISTEN`). Stop it, or stop your manual `sudo bun run start` before installing the boot service.
+- **Browser searches for "go" instead of opening it** — type `http://go/` (or `go/` with the trailing slash).
+- **`go` doesn't resolve** — check `/etc/hosts` has `127.0.0.1 go`. A VPN or DNS-filtering app can also override it.
+- **Boot service doesn't start** — keep the project out of `~/Desktop`, `~/Documents` and `~/Downloads` (macOS blocks background services from reading them). If you move the project or reinstall Bun, redo the `sed` install step.
+- **Permission errors on `data/` or `bun run backup`** — the server runs as root, so it may create root-owned files. Fix with `sudo chown -R $USER data`.
