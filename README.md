@@ -21,10 +21,9 @@ sudo bun run start    # http://go/admin (or PORT=3000 bun run dev for http://loc
 | `bun run start` / `dev` | run the server (`dev` hot-reloads) |
 | `bun test` | tests |
 | `bun check` | typecheck |
-| `bun run backup` | consistent SQLite snapshot into `backups/` |
 | `bun run build` | single executable at `out/go-links` |
 
-Config (optional, via `.env`): `PORT` (default 80), `DB_PATH` (default `data/links.db`).
+Config (optional, environment variables): `PORT` (default 80), `DB_PATH` (default `data/links.db`).
 
 ## Making `go/foo` work
 
@@ -52,4 +51,3 @@ Logs go to `/tmp/go-links.log`. In Chrome, type `go/` or `http://go/admin` so it
 - **Browser searches for "go" instead of opening it** — type `http://go/` (or `go/` with the trailing slash).
 - **`go` doesn't resolve** — check `/etc/hosts` has `127.0.0.1 go`. A VPN or DNS-filtering app can also override it.
 - **Boot service doesn't start** — keep the project out of `~/Desktop`, `~/Documents` and `~/Downloads` (macOS blocks background services from reading them). If you move the project or reinstall Bun, redo the `sed` install step.
-- **Permission errors on `data/` or `bun run backup`** — the server runs as root, so it may create root-owned files. Fix with `sudo chown -R $USER data`.

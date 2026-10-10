@@ -8,7 +8,6 @@
     "start": "NODE_ENV=production bun index.ts",
     "dev": "bun --hot index.ts",
     "test": "bun test",
-    "backup": "bun scripts/backup.ts",
     "build": "bun build --compile index.ts --outfile out/go-links"
   },
   "devDependencies": {
