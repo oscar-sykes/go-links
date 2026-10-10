@@ -20,11 +20,11 @@ Re-run `bun run setup` to restart the service after changing code; `bun run setu
 | Script | What it does |
 | --- | --- |
 | `bun run setup` | install/restart the boot service (macOS) |
-| `bun run start` / `dev` | run the server in the foreground (`dev` hot-reloads; use `PORT=3000` to avoid `sudo`) |
+| `bun run start` / `dev` | run the server in the foreground (`dev` hot-reloads); needs `sudo` for port 80 |
 | `bun test` | tests |
 | `bun check` | typecheck |
 
-Config (optional, environment variables): `PORT` (default 80), `DB_PATH` (default `data/links.db`). Port 80 needs root, which is why the boot service and `sudo bun run start` run as root.
+The server always listens on `127.0.0.1:80` and stores links in `data/links.db`. Port 80 needs root, which is why the boot service and `sudo bun run start` run as root.
 
 ## Troubleshooting
 
