@@ -1,18 +1,18 @@
 # go-links
 
-Self-hosted `go/` link shortener, built entirely on Bun: `Bun.serve` routes, `bun:sqlite`, HTML imports for the admin UI, `bun test`, `Bun.$` and `bun build --compile`.
+Personal `go/` link shortener that runs only on your machine. Built entirely on Bun: `Bun.serve` routes, `bun:sqlite`, HTML imports for the admin UI, `bun test`, `Bun.$` and `bun build --compile`.
+
+The server listens on `127.0.0.1` only, so nothing else on the network can reach it. API requests must also come from a known host (`localhost`, `127.0.0.1`, `go`) and the same origin, so other websites can't edit your links.
 
 ## Run
 
 ```sh
 bun install
-cp .env.example .env   # set ADMIN_TOKEN
-bun run dev            # http://localhost:3000/admin
+bun run dev    # http://localhost:3000/admin
 ```
 
-- `/admin` — manage links (enter your `ADMIN_TOKEN`)
+- `/admin` — add and delete links
 - `/:slug` — 302 redirect, counts hits
-- `GET/POST /api/links`, `DELETE /api/links/:slug` — Bearer-token API
 
 ## Scripts
 
@@ -24,8 +24,11 @@ bun run dev            # http://localhost:3000/admin
 | `bun run backup` | consistent SQLite snapshot into `backups/` |
 | `bun run build` | single executable at `out/go-links` |
 
+Config (optional, via `.env`): `PORT` (default 3000), `DB_PATH` (default `data/links.db`).
+
 ## Making `go/foo` work
 
-- **This machine only:** add `127.0.0.1 go` to `/etc/hosts`, run with `PORT=80` (needs sudo).
-- **All your devices:** run it on one machine and use Tailscale MagicDNS (name the machine `go`).
-- **Public:** put it behind a Cloudflare Tunnel on your own domain.
+```sh
+echo "127.0.0.1 go" | sudo tee -a /etc/hosts
+PORT=80 sudo bun run start
+```

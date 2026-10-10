@@ -1,19 +1,25 @@
-import { timingSafeEqual } from "node:crypto";
 import admin from "./admin.html";
 import { validate, type Store } from "./db";
 
-function authorized(req: Request, token: string): boolean {
-  const given = Buffer.from(req.headers.get("authorization")?.replace(/^Bearer /, "") ?? "");
-  const want = Buffer.from(token);
-  return given.length === want.length && timingSafeEqual(given, want);
+// The server only listens on loopback, but any webpage you visit can still send
+// requests to it. Requiring a known Host (blocks DNS rebinding) and a same-origin
+// Origin (blocks cross-site writes) keeps other sites from editing your links.
+const ALLOWED_HOSTS = new Set(["localhost", "127.0.0.1", "go"]);
+
+function trusted(req: Request): boolean {
+  const host = req.headers.get("host") ?? "";
+  if (!ALLOWED_HOSTS.has(host.split(":")[0]!)) return false;
+  const origin = req.headers.get("origin");
+  return !origin || new URL(origin).host === host;
 }
 
-export function createServer(store: Store, token: string, port: number) {
+export function createServer(store: Store, port: number, hostname = "127.0.0.1") {
   const guard = (fn: (req: any) => Response | Promise<Response>) => (req: Request) =>
-    authorized(req, token) ? fn(req) : Response.json({ error: "unauthorized" }, { status: 401 });
+    trusted(req) ? fn(req) : Response.json({ error: "forbidden" }, { status: 403 });
 
   return Bun.serve({
     port,
+    hostname,
     routes: {
       "/": Response.redirect("/admin"),
       "/admin": admin,
