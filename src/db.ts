@@ -31,9 +31,13 @@ export function createStore(path = ":memory:") {
   )`);
 
   const list = db.query<Link, []>("SELECT * FROM links ORDER BY created_at DESC, slug");
-  const upsert = db.query("INSERT INTO links (slug, url) VALUES ($slug, $url) ON CONFLICT(slug) DO UPDATE SET url = excluded.url");
+  const upsert = db.query(
+    "INSERT INTO links (slug, url) VALUES ($slug, $url) ON CONFLICT(slug) DO UPDATE SET url = excluded.url",
+  );
   const remove = db.query("DELETE FROM links WHERE slug = $slug");
-  const hit = db.query<{ url: string }, { $slug: string }>("UPDATE links SET hits = hits + 1 WHERE slug = $slug RETURNING url");
+  const hit = db.query<{ url: string }, { $slug: string }>(
+    "UPDATE links SET hits = hits + 1 WHERE slug = $slug RETURNING url",
+  );
 
   return {
     db,

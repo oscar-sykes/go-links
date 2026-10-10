@@ -36,7 +36,9 @@ export function createServer(store: Store, port: number, hostname = "127.0.0.1")
       },
       "/api/links/:slug": {
         DELETE: guard((req) =>
-          store.remove(req.params.slug) ? new Response(null, { status: 204 }) : Response.json({ error: "not found" }, { status: 404 }),
+          store.remove(req.params.slug)
+            ? new Response(null, { status: 204 })
+            : Response.json({ error: "not found" }, { status: 404 }),
         ),
       },
       "/:slug": (req) => {

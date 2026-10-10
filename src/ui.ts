@@ -4,7 +4,9 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 const json = { "content-type": "application/json" };
 
 async function refresh() {
-  const links: { slug: string; url: string; hits: number }[] = await (await fetch("/api/links")).json();
+  const links: { slug: string; url: string; hits: number }[] = await (
+    await fetch("/api/links")
+  ).json();
   $("rows").replaceChildren(
     ...links.map((l) => {
       const tr = document.createElement("tr");
@@ -30,7 +32,11 @@ $("add").onsubmit = async (e) => {
   e.preventDefault();
   const slug = $<HTMLInputElement>("slug");
   const url = $<HTMLInputElement>("url");
-  const res = await fetch("/api/links", { method: "POST", headers: json, body: JSON.stringify({ slug: slug.value, url: url.value }) });
+  const res = await fetch("/api/links", {
+    method: "POST",
+    headers: json,
+    body: JSON.stringify({ slug: slug.value, url: url.value }),
+  });
   $("error").textContent = res.ok ? "" : ((await res.json()) as { error: string }).error;
   if (res.ok) {
     slug.value = url.value = "";

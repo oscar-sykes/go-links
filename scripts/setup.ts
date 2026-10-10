@@ -46,4 +46,6 @@ await $`sudo launchctl bootstrap system ${PLIST}`;
 
 await Bun.sleep(1000);
 const ok = (await fetch("http://go/").catch(() => null))?.ok;
-console.log(ok ? "Running: http://go/" : "Installed, but http://go/ didn't respond. Check /tmp/go-links.log");
+console.log(
+  ok ? "Running: http://go/" : "Installed, but http://go/ didn't respond. Check /tmp/go-links.log",
+);
