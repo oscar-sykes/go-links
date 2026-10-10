@@ -36,10 +36,10 @@ test("create, redirect, count hits, delete", async () => {
   expect(hop.headers.get("location")).toBe("https://github.com/");
   await fetch(`${base}/gh`, { redirect: "manual" });
 
-  const links = (await (await fetch(`${base}/api/links`, )).json()) as { slug: string; hits: number }[];
+  const links = (await (await fetch(`${base}/api/links`)).json()) as { slug: string; hits: number }[];
   expect(links[0]).toMatchObject({ slug: "gh", hits: 2 });
 
-  expect((await fetch(`${base}/api/links/gh`, { method: "DELETE",  })).status).toBe(204);
+  expect((await fetch(`${base}/api/links/gh`, { method: "DELETE" })).status).toBe(204);
   expect((await fetch(`${base}/gh`, { redirect: "manual" })).status).toBe(404);
 });
 
