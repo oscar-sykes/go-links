@@ -1,6 +1,6 @@
 # go-links
 
-Personal `go/` link shortener that runs only on your machine. Built entirely on Bun: `Bun.serve` routes, `bun:sqlite`, HTML imports for the UI, `bun test`, `Bun.$` and `bun build --compile`.
+Personal `go/` link shortener that runs only on your machine. Built entirely on Bun: `Bun.serve` routes, `bun:sqlite`, HTML imports for the UI, `bun test` and `Bun.$`.
 
 The server listens on `127.0.0.1` only, so nothing else on the network can reach it. API requests must also come from a known host (`localhost`, `127.0.0.1`, `go`) and the same origin, so other websites can't edit your links.
 
@@ -8,46 +8,29 @@ The server listens on `127.0.0.1` only, so nothing else on the network can reach
 
 ```sh
 bun install
-sudo bun run start    # http://go/ (or PORT=3000 bun run dev for http://localhost:3000/)
+bun run setup    # once: adds `go` to /etc/hosts and runs the server at boot (asks for your password)
 ```
 
-- `/` — add and delete links
-- `/:slug` — 302 redirect, counts hits
+Then open http://go/ to add and delete links. `/:slug` is a 302 redirect that counts hits.
+
+Re-run `bun run setup` to restart the service after changing code; `bun run setup --uninstall` removes it.
 
 ## Scripts
 
 | Script | What it does |
 | --- | --- |
-| `bun run start` / `dev` | run the server (`dev` hot-reloads) |
+| `bun run setup` | install/restart the boot service (macOS) |
+| `bun run start` / `dev` | run the server in the foreground (`dev` hot-reloads; use `PORT=3000` to avoid `sudo`) |
 | `bun test` | tests |
 | `bun check` | typecheck |
-| `bun run build` | single executable at `out/go-links` |
 
-Config (optional, environment variables): `PORT` (default 80), `DB_PATH` (default `data/links.db`).
+Config (optional, environment variables): `PORT` (default 80), `DB_PATH` (default `data/links.db`). Port 80 needs root, which is why the boot service and `sudo bun run start` run as root.
 
-## Making `go/foo` work
+## Troubleshooting
 
-```sh
-echo "127.0.0.1 go" | sudo tee -a /etc/hosts   # once
-sudo bun run start                              # http://go/
-```
-
-Port 80 is privileged, hence `sudo`.
-
-To start it automatically at boot instead (macOS LaunchDaemon, runs as root, restarts on crash):
-
-```sh
-sed -e "s|__BUN__|$(which bun)|" -e "s|__DIR__|$PWD|" com.go-links.plist | sudo tee /Library/LaunchDaemons/com.go-links.plist >/dev/null
-sudo launchctl bootstrap system /Library/LaunchDaemons/com.go-links.plist
-# stop/remove: sudo launchctl bootout system /Library/LaunchDaemons/com.go-links.plist
-```
-
-Logs go to `/tmp/go-links.log`. In Chrome, type `go/` with the trailing slash, or `http://go/` so it isn't treated as a search.
-
-### Troubleshooting
-
-- **Nothing happens / connection refused** — the server isn't running on port 80. Check `/tmp/go-links.log` (boot service) or the terminal running `sudo bun run start`. Make sure `bun install` has been run.
-- **`EADDRINUSE` / port 80 in use** — something else is using it (`sudo lsof -iTCP:80 -sTCP:LISTEN`). Stop it, or stop your manual `sudo bun run start` before installing the boot service.
-- **Browser searches for "go" instead of opening it** — type `http://go/` (or `go/` with the trailing slash).
+- **Nothing happens / connection refused** — check `/tmp/go-links.log`, and make sure `bun install` has been run.
+- **`EADDRINUSE` / port 80 in use** — something else is using it (`sudo lsof -iTCP:80 -sTCP:LISTEN`), possibly a manual `sudo bun run start`.
+- **Browser searches for "go" instead of opening it** — type `http://go/`, or `go/` with the trailing slash.
 - **`go` doesn't resolve** — check `/etc/hosts` has `127.0.0.1 go`. A VPN or DNS-filtering app can also override it.
-- **Boot service doesn't start** — keep the project out of `~/Desktop`, `~/Documents` and `~/Downloads` (macOS blocks background services from reading them). If you move the project or reinstall Bun, redo the `sed` install step.
+- **Service doesn't start** — keep the project out of `~/Desktop`, `~/Documents` and `~/Downloads` (macOS blocks background services from reading them). If you move the project or reinstall Bun, re-run `bun run setup`.
+- **Permission errors on `data/`** — the server runs as root, so it may create root-owned files. Fix with `sudo chown -R $USER data`.

@@ -4,11 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "typecheck": "bun check",
     "start": "NODE_ENV=production bun index.ts",
     "dev": "bun --hot index.ts",
     "test": "bun test",
-    "build": "bun build --compile index.ts --outfile out/go-links"
+    "setup": "bun scripts/setup.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
