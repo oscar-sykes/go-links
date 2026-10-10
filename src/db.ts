@@ -4,7 +4,7 @@ import { dirname } from "node:path";
 
 export type Link = { slug: string; url: string; hits: number; created_at: number };
 
-export const RESERVED = new Set(["admin", "api", "favicon.ico"]);
+export const RESERVED = new Set(["api", "favicon.ico"]);
 const SLUG_RE = /^[a-z0-9][a-z0-9_-]{0,63}$/;
 
 export function validate(slug: string, url: string): string | null {

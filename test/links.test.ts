@@ -16,7 +16,7 @@ beforeEach(() => {
 test("validate rejects bad slugs, reserved slugs and non-http urls", () => {
   expect(validate("ok-1", "https://example.com")).toBeNull();
   expect(validate("Bad Slug", "https://example.com")).not.toBeNull();
-  expect(validate("admin", "https://example.com")).not.toBeNull();
+  expect(validate("api", "https://example.com")).not.toBeNull();
   expect(validate("x", "javascript:alert(1)")).not.toBeNull();
 });
 

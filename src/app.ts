@@ -1,4 +1,4 @@
-import admin from "./admin.html";
+import ui from "./ui.html";
 import { validate, type Store } from "./db";
 
 // The server only listens on loopback, but any webpage you visit can still send
@@ -21,8 +21,7 @@ export function createServer(store: Store, port: number, hostname = "127.0.0.1")
     port,
     hostname,
     routes: {
-      "/": Response.redirect("/admin"),
-      "/admin": admin,
+      "/": ui,
       "/api/links": {
         GET: guard(() => Response.json(store.list())),
         POST: guard(async (req) => {
