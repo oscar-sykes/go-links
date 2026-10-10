@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 const json = { "content-type": "application/json" };

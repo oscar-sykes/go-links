@@ -8,7 +8,7 @@ The server listens on `127.0.0.1` only, so nothing else on the network can reach
 
 ```sh
 bun install
-bun run dev    # http://localhost:3000/admin
+sudo bun run start    # http://go/admin (or PORT=3000 bun run dev for http://localhost:3000/admin)
 ```
 
 - `/admin` — add and delete links
@@ -24,11 +24,23 @@ bun run dev    # http://localhost:3000/admin
 | `bun run backup` | consistent SQLite snapshot into `backups/` |
 | `bun run build` | single executable at `out/go-links` |
 
-Config (optional, via `.env`): `PORT` (default 3000), `DB_PATH` (default `data/links.db`).
+Config (optional, via `.env`): `PORT` (default 80), `DB_PATH` (default `data/links.db`).
 
 ## Making `go/foo` work
 
 ```sh
-echo "127.0.0.1 go" | sudo tee -a /etc/hosts
-PORT=80 sudo bun run start
+echo "127.0.0.1 go" | sudo tee -a /etc/hosts   # once
+sudo bun run start                              # http://go/admin
 ```
+
+Port 80 is privileged, hence `sudo`.
+
+To start it automatically at boot instead (macOS LaunchDaemon, runs as root, restarts on crash):
+
+```sh
+sudo cp com.go-links.plist /Library/LaunchDaemons/
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.go-links.plist
+# stop/remove: sudo launchctl bootout system /Library/LaunchDaemons/com.go-links.plist
+```
+
+Logs go to `/tmp/go-links.log`. In Chrome, type `go/` or `http://go/admin` so it isn't treated as a search.
