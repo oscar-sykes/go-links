@@ -23,12 +23,18 @@ test("validate rejects bad slugs, reserved slugs and non-http urls", () => {
 test("api rejects unknown hosts and cross-site origins", async () => {
   const url = `${base}/api/links`;
   expect((await fetch(url, { headers: { host: "evil.example" } })).status).toBe(403);
-  expect((await fetch(url, { method: "POST", headers: { origin: "https://evil.example" }, body: "{}" })).status).toBe(403);
+  expect(
+    (await fetch(url, { method: "POST", headers: { origin: "https://evil.example" }, body: "{}" }))
+      .status,
+  ).toBe(403);
   expect((await fetch(url)).status).toBe(200);
 });
 
 test("create, redirect, count hits, delete", async () => {
-  const res = await fetch(`${base}/api/links`, { method: "POST", body: JSON.stringify({ slug: "GH", url: "https://github.com" }) });
+  const res = await fetch(`${base}/api/links`, {
+    method: "POST",
+    body: JSON.stringify({ slug: "GH", url: "https://github.com" }),
+  });
   expect(res.status).toBe(201);
 
   const hop = await fetch(`${base}/gh`, { redirect: "manual" });
@@ -36,7 +42,10 @@ test("create, redirect, count hits, delete", async () => {
   expect(hop.headers.get("location")).toBe("https://github.com/");
   await fetch(`${base}/gh`, { redirect: "manual" });
 
-  const links = (await (await fetch(`${base}/api/links`)).json()) as { slug: string; hits: number }[];
+  const links = (await (await fetch(`${base}/api/links`)).json()) as {
+    slug: string;
+    hits: number;
+  }[];
   expect(links[0]).toMatchObject({ slug: "gh", hits: 2 });
 
   expect((await fetch(`${base}/api/links/gh`, { method: "DELETE" })).status).toBe(204);
