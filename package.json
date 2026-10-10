@@ -1,0 +1,20 @@
+{
+  "name": "go-links",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "bun check",
+    "start": "bun index.ts",
+    "dev": "bun --hot index.ts",
+    "test": "bun test",
+    "backup": "bun scripts/backup.ts",
+    "build": "bun build --compile index.ts --outfile out/go-links"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  }
+}
