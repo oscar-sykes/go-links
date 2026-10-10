@@ -1,25 +1,32 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>go/ links</title>
-  <link rel="stylesheet" href="./ui.css" />
-</head>
-<body>
-  <main>
-    <h1>go/ links</h1>
-    <form id="add">
-      <input id="slug" placeholder="slug" required />
-      <input id="url" type="url" placeholder="https://…" required />
-      <button>Save</button>
-    </form>
-    <p id="error" role="alert"></p>
-    <table>
-      <thead><tr><th>Link</th><th>Target</th><th>Hits</th><th></th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
-  </main>
-  <script type="module" src="./ui.ts"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>go/ links</title>
+    <link rel="stylesheet" href="./ui.css" />
+  </head>
+  <body>
+    <main>
+      <h1>go/ links</h1>
+      <form id="add">
+        <input id="slug" placeholder="slug" required />
+        <input id="url" type="url" placeholder="https://…" required />
+        <button>Save</button>
+      </form>
+      <p id="error" role="alert"></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Link</th>
+            <th>Target</th>
+            <th>Hits</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </main>
+    <script type="module" src="./ui.ts"></script>
+  </body>
 </html>

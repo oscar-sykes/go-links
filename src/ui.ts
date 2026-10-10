@@ -14,7 +14,12 @@ async function refresh() {
         await fetch(`/api/links/${l.slug}`, { method: "DELETE" });
         refresh();
       };
-      const cells = [Object.assign(document.createElement("code"), { textContent: `go/${l.slug}` }), a, document.createTextNode(String(l.hits)), del];
+      const cells = [
+        Object.assign(document.createElement("code"), { textContent: `go/${l.slug}` }),
+        a,
+        document.createTextNode(String(l.hits)),
+        del,
+      ];
       for (const c of cells) tr.appendChild(document.createElement("td")).append(c);
       return tr;
     }),

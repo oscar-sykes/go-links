@@ -1,15 +1,19 @@
 {
   "name": "go-links",
-  "module": "index.ts",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "module": "index.ts",
   "scripts": {
     "start": "NODE_ENV=production bun index.ts",
     "dev": "bun --hot index.ts",
     "test": "bun test",
-    "setup": "bun scripts/setup.ts"
+    "setup": "bun scripts/setup.ts",
+    "lint": "oxlint",
+    "fmt": "oxfmt"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0"
   }
 }
