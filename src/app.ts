@@ -31,7 +31,7 @@ export function createServer(
     routes: {
       "/": ui,
       "/api/links": {
-        GET: guard(() => Response.json(store.list())),
+        GET: guard(async () => Response.json(await store.list())),
         POST: guard(async (req) => {
           const body = (await req.json().catch(() => ({}))) as {
             slug?: string;
@@ -41,19 +41,19 @@ export function createServer(
           const url = (body.url ?? "").trim();
           const err = validate(slug, url);
           if (err) return Response.json({ error: err }, { status: 400 });
-          store.upsert(slug, url);
+          await store.upsert(slug, url);
           return Response.json({ slug, url }, { status: 201 });
         }),
       },
       "/api/links/:slug": {
-        DELETE: guard((req) =>
-          store.remove(req.params.slug)
+        DELETE: guard(async (req) =>
+          (await store.remove(req.params.slug))
             ? new Response(null, { status: 204 })
             : Response.json({ error: "not found" }, { status: 404 }),
         ),
       },
-      "/:slug": (req) => {
-        const url = store.resolve(req.params.slug.toLowerCase());
+      "/:slug": async (req) => {
+        const url = await store.resolve(req.params.slug.toLowerCase());
         return url
           ? Response.redirect(url, 302)
           : new Response("No such link", { status: 404 });

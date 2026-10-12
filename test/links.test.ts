@@ -1,14 +1,14 @@
 import { beforeEach, expect, test } from "bun:test";
 import { createServer } from "../src/app";
-import { createStore, validate } from "../src/db";
+import { createStore, validate, type Store } from "../src/db";
 
-let store: ReturnType<typeof createStore>;
+let store: Store;
 let base: string;
 let server: ReturnType<typeof createServer>;
 
-beforeEach(() => {
+beforeEach(async () => {
   server?.stop(true);
-  store = createStore();
+  store = await createStore();
   server = createServer(store, 0);
   base = server.url.origin;
 });
@@ -67,6 +67,6 @@ test("posting an existing slug updates its target", async () => {
       method: "POST",
       body: JSON.stringify({ slug: "x", url }),
     });
-  expect(store.list()).toHaveLength(1);
-  expect(store.resolve("x")).toBe("https://b.example");
+  expect(await store.list()).toHaveLength(1);
+  expect(await store.resolve("x")).toBe("https://b.example");
 });
