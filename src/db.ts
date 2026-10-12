@@ -1,4 +1,4 @@
-import { Database } from "bun:sqlite";
+import { SQL } from "bun";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 
@@ -25,37 +25,35 @@ export function validate(slug: string, url: string): string | null {
   return null;
 }
 
-export function createStore(path = ":memory:") {
+export async function createStore(path = ":memory:") {
   if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
-  const db = new Database(path, { create: true });
-  db.run("PRAGMA journal_mode = WAL");
-  db.run(`CREATE TABLE IF NOT EXISTS links (
+  const db = new SQL({ adapter: "sqlite", filename: path });
+  await db`PRAGMA journal_mode = WAL`;
+  await db`CREATE TABLE IF NOT EXISTS links (
     slug TEXT PRIMARY KEY,
     url TEXT NOT NULL,
     hits INTEGER NOT NULL DEFAULT 0,
     created_at INTEGER NOT NULL DEFAULT (unixepoch())
-  )`);
-
-  const list = db.query<Link, []>(
-    "SELECT * FROM links ORDER BY created_at DESC, slug",
-  );
-  const upsert = db.query(
-    "INSERT INTO links (slug, url) VALUES ($slug, $url) ON CONFLICT(slug) DO UPDATE SET url = excluded.url",
-  );
-  const remove = db.query("DELETE FROM links WHERE slug = $slug");
-  const hit = db.query<{ url: string }, { $slug: string }>(
-    "UPDATE links SET hits = hits + 1 WHERE slug = $slug RETURNING url",
-  );
+  )`;
 
   return {
     db,
-    list: () => list.all(),
-    upsert: (slug: string, url: string) =>
-      void upsert.run({ $slug: slug, $url: url }),
-    remove: (slug: string) => remove.run({ $slug: slug }).changes > 0,
+    list: (): Promise<Link[]> =>
+      db`SELECT * FROM links ORDER BY created_at DESC, slug`,
+    upsert: async (slug: string, url: string) => {
+      await db`INSERT INTO links (slug, url) VALUES (${slug}, ${url})
+        ON CONFLICT(slug) DO UPDATE SET url = excluded.url`;
+    },
+    remove: async (slug: string) =>
+      (await db`DELETE FROM links WHERE slug = ${slug} RETURNING slug`).length >
+      0,
     /** Returns the target URL and bumps the hit counter, or null if unknown. */
-    resolve: (slug: string) => hit.get({ $slug: slug })?.url ?? null,
+    resolve: async (slug: string) => {
+      const [row] = await db`UPDATE links SET hits = hits + 1
+        WHERE slug = ${slug} RETURNING url`;
+      return (row?.url as string | undefined) ?? null;
+    },
   };
 }
 
-export type Store = ReturnType<typeof createStore>;
+export type Store = Awaited<ReturnType<typeof createStore>>;
