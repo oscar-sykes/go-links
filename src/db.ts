@@ -1,3 +1,4 @@
+import { SQL } from "bun";
 import { desc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sql/sqlite";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
@@ -33,7 +34,8 @@ export function validate(slug: string, url: string): string | null {
 
 export async function createStore(path = ":memory:") {
   if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
-  const db = drizzle({ connection: { adapter: "sqlite", filename: path } });
+  const client = new SQL({ adapter: "sqlite", filename: path });
+  const db = drizzle({ client });
   await db.run(sql`PRAGMA journal_mode = WAL`);
   await db.run(sql`CREATE TABLE IF NOT EXISTS links (
     slug TEXT PRIMARY KEY,
