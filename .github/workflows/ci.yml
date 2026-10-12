@@ -11,9 +11,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: canary
       - run: bun install --frozen-lockfile
       - run: bun check
-      - run: bun run lint
-      - run: bun run fmt --check
+      - run: bun lint
+      - run: bun format --check
       - run: bun test

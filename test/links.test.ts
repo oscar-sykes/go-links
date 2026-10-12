@@ -22,10 +22,17 @@ test("validate rejects bad slugs, reserved slugs and non-http urls", () => {
 
 test("api rejects unknown hosts and cross-site origins", async () => {
   const url = `${base}/api/links`;
-  expect((await fetch(url, { headers: { host: "evil.example" } })).status).toBe(403);
+  expect((await fetch(url, { headers: { host: "evil.example" } })).status).toBe(
+    403,
+  );
   expect(
-    (await fetch(url, { method: "POST", headers: { origin: "https://evil.example" }, body: "{}" }))
-      .status,
+    (
+      await fetch(url, {
+        method: "POST",
+        headers: { origin: "https://evil.example" },
+        body: "{}",
+      })
+    ).status,
   ).toBe(403);
   expect((await fetch(url)).status).toBe(200);
 });
@@ -48,13 +55,18 @@ test("create, redirect, count hits, delete", async () => {
   }[];
   expect(links[0]).toMatchObject({ slug: "gh", hits: 2 });
 
-  expect((await fetch(`${base}/api/links/gh`, { method: "DELETE" })).status).toBe(204);
+  expect(
+    (await fetch(`${base}/api/links/gh`, { method: "DELETE" })).status,
+  ).toBe(204);
   expect((await fetch(`${base}/gh`, { redirect: "manual" })).status).toBe(404);
 });
 
 test("posting an existing slug updates its target", async () => {
   for (const url of ["https://a.example", "https://b.example"])
-    await fetch(`${base}/api/links`, { method: "POST", body: JSON.stringify({ slug: "x", url }) });
+    await fetch(`${base}/api/links`, {
+      method: "POST",
+      body: JSON.stringify({ slug: "x", url }),
+    });
   expect(store.list()).toHaveLength(1);
   expect(store.resolve("x")).toBe("https://b.example");
 });

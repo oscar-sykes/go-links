@@ -6,13 +6,9 @@
   "scripts": {
     "start": "NODE_ENV=production bun index.ts",
     "test": "bun test",
-    "setup": "bun scripts/setup.ts",
-    "lint": "oxlint",
-    "fmt": "oxfmt"
+    "setup": "bun scripts/setup.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "oxfmt": "^0.72.0",
-    "oxlint": "^1.87.0"
+    "@types/bun": "latest"
   }
 }
